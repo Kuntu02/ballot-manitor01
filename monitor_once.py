@@ -1,6 +1,6 @@
 """
 GitHub Actions-d zoriulsan huvilbar.
-Neg ajillagaanii dotor ~4.5 minut turshid 20 sekund tutam davtan shalgana.
+Neg ajillagaa ~5 cag 50 minut turshid minut tutam shalgana.
 URL, TOPIC-iig GitHub Secrets-ees avna (kod dotor bichihgui).
 """
 
@@ -15,8 +15,8 @@ URL = os.environ["URL"]
 TOPIC = os.environ["TOPIC"]
 COUNTRY = "Mongolia"
 
-RUN_SECONDS = 270   # Ene ajillagaa heden sekund ajillah ve (~4.5 minut)
-INTERVAL = 20       # Heden sekund tutam shalgah ve
+RUN_SECONDS = 21000   # ~5 cag 50 minut
+INTERVAL = 60         # minut tutam
 
 
 def fetch_text(url):
