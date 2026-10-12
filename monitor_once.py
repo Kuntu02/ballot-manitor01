@@ -1,16 +1,22 @@
 """
-GitHub Actions-d zoriulsan huvilbar: neg udaa shalgaad duusna.
+GitHub Actions-d zoriulsan huvilbar.
+Neg ajillagaanii dotor ~4.5 minut turshid 20 sekund tutam davtan shalgana.
 URL, TOPIC-iig GitHub Secrets-ees avna (kod dotor bichihgui).
 """
 
 import os
 import re
 import sys
+import time
 import urllib.request
+from datetime import datetime
 
 URL = os.environ["URL"]
 TOPIC = os.environ["TOPIC"]
 COUNTRY = "Mongolia"
+
+RUN_SECONDS = 270   # Ene ajillagaa heden sekund ajillah ve (~4.5 minut)
+INTERVAL = 20       # Heden sekund tutam shalgah ve
 
 
 def fetch_text(url):
@@ -32,19 +38,38 @@ def notify(message):
     urllib.request.urlopen(req, timeout=30)
 
 
+def log(msg):
+    print(f"[{datetime.utcnow():%H:%M:%S} UTC] {msg}", flush=True)
+
+
 def main():
-    text = fetch_text(URL)
-    i = text.find(COUNTRY)
-    if i == -1:
-        print("Mongolia mor oldsongui. Huudas JavaScript-eer achaalldag baij magadgui.")
+    end = time.time() + RUN_SECONDS
+    ok_reads = 0
+    while True:
+        try:
+            text = fetch_text(URL)
+            i = text.find(COUNTRY)
+            if i == -1:
+                log("Mongolia mor oldsongui. Huudas JavaScript-eer achaalldag baij magadgui.")
+            else:
+                ok_reads += 1
+                snippet = text[i + len(COUNTRY): i + len(COUNTRY) + 12].upper()
+                log("Snippet: " + snippet)
+                if "PAUSED" not in snippet:
+                    log("TULUV OORCHLOGDLOO!")
+                    notify("Mongolia-iin tuluv oorchlogdloo! Odoo huudsaa shalga: " + URL)
+                    return
+        except Exception as e:
+            log(f"Aldaa: {e}")
+
+        if time.time() + INTERVAL > end:
+            break
+        time.sleep(INTERVAL)
+
+    if ok_reads == 0:
+        log("Neg ch udaa amjilttai unshigdsangui.")
         sys.exit(1)  # Ajillagaa fail bolj, GitHub email yavuulna
-    snippet = text[i + len(COUNTRY): i + len(COUNTRY) + 12].upper()
-    print("Snippet:", snippet)
-    if "PAUSED" in snippet:
-        print("Odoogoor PAUSED.")
-    else:
-        print("TULUV OORCHLOGDLOO!")
-        notify("Mongolia-iin tuluv oorchlogdloo! Odoo huudsaa shalga: " + URL)
+    log("Odoogoor PAUSED.")
 
 
 if __name__ == "__main__":
