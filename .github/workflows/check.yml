@@ -5,6 +5,10 @@ on:
     - cron: "7 * * * *"
   workflow_dispatch:
 
+permissions:
+  actions: write
+  contents: read
+
 concurrency:
   group: check-ballot
   cancel-in-progress: false
@@ -23,3 +27,10 @@ jobs:
           URL: ${{ secrets.URL }}
           TOPIC: ${{ secrets.TOPIC }}
         run: python monitor_once.py
+      - name: Restart itself
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sleep 60
+          gh workflow run check.yml -R ${{ github.repository }} --ref ${{ github.ref_name }}
