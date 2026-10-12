@@ -1,0 +1,20 @@
+name: Check ballot
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # 5 minut tutam (GitHub-iin hamgiin bagad hugatsaa)
+  workflow_dispatch:         # Gar aar "Run workflow" darj turshij uzehed
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run check
+        env:
+          URL: ${{ secrets.URL }}
+          TOPIC: ${{ secrets.TOPIC }}
+        run: python monitor_once.py
