@@ -38,7 +38,7 @@ def main():
     if i == -1:
         print("Mongolia mor oldsongui. Huudas JavaScript-eer achaalldag baij magadgui.")
         sys.exit(1)  # Ajillagaa fail bolj, GitHub email yavuulna
-    snippet = text[i + len(COUNTRY): i + len(COUNTRY) + 40].upper()
+    snippet = text[i + len(COUNTRY): i + len(COUNTRY) + 12].upper()
     print("Snippet:", snippet)
     if "PAUSED" in snippet:
         print("Odoogoor PAUSED.")
