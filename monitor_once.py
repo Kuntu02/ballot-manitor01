@@ -10,7 +10,7 @@ import urllib.request
 
 URL = os.environ["URL"]
 TOPIC = os.environ["TOPIC"]
-COUNTRY = "Greece"
+COUNTRY = "Mongolia"
 
 
 def fetch_text(url):
