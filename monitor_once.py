@@ -9,7 +9,7 @@ import re
 import sys
 import time
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 URL = os.environ["URL"]
 TOPIC = os.environ["TOPIC"]
@@ -17,6 +17,7 @@ COUNTRY = "Mongolia"
 
 RUN_SECONDS = 21000   # ~5 cag 50 minut
 INTERVAL = 60         # minut tutam
+RENOTIFY_SECONDS = 300  # Tuluv oorchlogdson uyd 5 minut tutam davtaj mendchilne
 
 
 def fetch_text(url):
@@ -39,12 +40,14 @@ def notify(message):
 
 
 def log(msg):
-    print(f"[{datetime.utcnow():%H:%M:%S} UTC] {msg}", flush=True)
+    now = datetime.now(timezone(timedelta(hours=8)))  # Ulaanbaatar tsag
+    print(f"[{now:%H:%M:%S} UB] {msg}", flush=True)
 
 
 def main():
     end = time.time() + RUN_SECONDS
     ok_reads = 0
+    last_notify = 0
     while True:
         try:
             text = fetch_text(URL)
@@ -57,8 +60,9 @@ def main():
                 log("Snippet: " + snippet)
                 if "PAUSED" not in snippet:
                     log("TULUV OORCHLOGDLOO!")
-                    notify("Mongolia-iin tuluv oorchlogdloo! Odoo huudsaa shalga: " + URL)
-                    return
+                    if time.time() - last_notify > RENOTIFY_SECONDS:
+                        notify("Mongolia-iin tuluv oorchlogdloo! Odoo huudsaa shalga: " + URL)
+                        last_notify = time.time()
         except Exception as e:
             log(f"Aldaa: {e}")
 
@@ -69,7 +73,7 @@ def main():
     if ok_reads == 0:
         log("Neg ch udaa amjilttai unshigdsangui.")
         sys.exit(1)  # Ajillagaa fail bolj, GitHub email yavuulna
-    log("Odoogoor PAUSED.")
+    log("Ajillagaa duuslaa.")
 
 
 if __name__ == "__main__":
